@@ -27,16 +27,30 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
     <>
       <div className="card group hover:border-blue-500/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-500/10 flex flex-col">
         {/* Image / Category Header */}
-        <div className="relative h-48 bg-gradient-to-br from-slate-700 to-slate-800 rounded-t-xl flex items-center justify-center overflow-hidden">
-          <span className="text-6xl">{getCategoryIcon(vehicle.category)}</span>
-          <div className="absolute top-3 right-3">
+        <div className="relative h-52 bg-slate-800 rounded-t-xl overflow-hidden flex items-center justify-center">
+          {vehicle.imageUrl ? (
+            <img
+              src={vehicle.imageUrl}
+              alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+              onError={(e) => {
+                // fallback to emoji on broken image link
+                (e.target as HTMLElement).style.display = 'none';
+              }}
+            />
+          ) : (
+            <span className="text-6xl">{getCategoryIcon(vehicle.category)}</span>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute top-3 right-3 z-10">
             <Badge variant={stock.variant}>{stock.label}</Badge>
           </div>
-          <div className="absolute top-3 left-3">
+          <div className="absolute top-3 left-3 z-10">
             <Badge variant="info">{vehicle.category}</Badge>
           </div>
           {vehicle.category === 'Electric' && (
-            <div className="absolute bottom-3 right-3">
+            <div className="absolute bottom-3 right-3 z-10">
               <Zap className="w-4 h-4 text-yellow-400" />
             </div>
           )}

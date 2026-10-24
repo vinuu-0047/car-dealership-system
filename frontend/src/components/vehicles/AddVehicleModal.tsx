@@ -13,6 +13,7 @@ const schema = z.object({
   price: z.number({ coerce: true }).positive('Must be positive'),
   quantity: z.number({ coerce: true }).int().nonnegative(),
   vin: z.string().min(5, 'VIN required'),
+  imageUrl: z.string().url('Must be valid URL').optional().or(z.literal('')),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -85,6 +86,11 @@ export const AddVehicleModal: React.FC<Props> = ({ onClose }) => {
             <label className="label">VIN *</label>
             <input {...register('vin')} className="input font-mono" placeholder="TOY-CAM-2024-001" />
             {errors.vin && <p className="text-red-400 text-xs mt-1">{errors.vin.message}</p>}
+          </div>
+          <div>
+            <label className="label">Photo URL (Optional)</label>
+            <input {...register('imageUrl')} className="input" placeholder="https://images.unsplash.com/photo-..." />
+            {errors.imageUrl && <p className="text-red-400 text-xs mt-1">{errors.imageUrl.message}</p>}
           </div>
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="btn-secondary flex-1">Cancel</button>

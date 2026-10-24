@@ -12,6 +12,7 @@ const schema = z.object({
   category: z.string().min(1),
   year: z.number({ coerce: true }).int(),
   price: z.number({ coerce: true }).positive(),
+  imageUrl: z.string().url('Must be valid URL').optional().or(z.literal('')),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -31,6 +32,7 @@ export const EditVehicleModal: React.FC<Props> = ({ vehicle, onClose }) => {
       category: vehicle.category,
       year: vehicle.year,
       price: Number(vehicle.price),
+      imageUrl: vehicle.imageUrl || '',
     },
   });
 
@@ -79,6 +81,11 @@ export const EditVehicleModal: React.FC<Props> = ({ vehicle, onClose }) => {
           <div>
             <label className="label">Price (USD) *</label>
             <input type="number" step="0.01" {...register('price', { valueAsNumber: true })} className="input" />
+          </div>
+          <div>
+            <label className="label">Photo URL (Optional)</label>
+            <input {...register('imageUrl')} className="input" placeholder="https://images.unsplash.com/photo-..." />
+            {errors.imageUrl && <p className="text-red-400 text-xs mt-1">{errors.imageUrl.message}</p>}
           </div>
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="btn-secondary flex-1">Cancel</button>
