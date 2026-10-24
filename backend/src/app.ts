@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
+import path from 'path';
 import { authRouter } from './modules/auth/auth.router';
 import { vehiclesRouter } from './modules/vehicles/vehicles.router';
 import { errorHandler } from './middleware/error.middleware';
@@ -20,6 +21,9 @@ export const createApp = () => {
   if (process.env.NODE_ENV !== 'test') {
     app.use(morgan('dev'));
   }
+
+  // Serve authentic car photos statically
+  app.use('/cars', express.static(path.resolve(__dirname, '../../frontend/public/cars')));
 
   // Rate limiting (disabled in test)
   if (process.env.NODE_ENV !== 'test') {
