@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  fullName     String   @map("full_name")
+  role         Role     @default(CUSTOMER)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  purchases    PurchaseTransaction[]
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+model Vehicle {
+  id        String   @id @default(uuid())
+  make      String
+  model     String
+  category  String
+  year      Int
+  price     Decimal  @db.Decimal(10, 2)
+  quantity  Int      @default(0)
+  vin       String   @unique
+  imageUrl  String?  @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  purchases PurchaseTransaction[]
+  auditLogs AuditLog[]
+
+  @@map("vehicles")
+}
+
+model PurchaseTransaction {
+  id               String   @id @default(uuid())
+  userId           String   @map("user_id")
+  vehicleId        String   @map("vehicle_id")
+  priceAtPurchase  Decimal  @map("price_at_purchase") @db.Decimal(10, 2)
+  purchasedAt      DateTime @default(now()) @map("purchased_at")
+  status           String   @default("COMPLETED")
+
+  user    User    @relation(fields: [userId], references: [id])
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+
+  @@map("purchase_transactions")
+}
+
+model AuditLog {
+  id             String   @id @default(uuid())
+  vehicleId      String   @map("vehicle_id")
+  performedById  String   @map("performed_by_id")
+  action         String
+  quantityChange Int?     @map("quantity_change")
+  notes          String?
+  timestamp      DateTime @default(now())
+
+  vehicle     Vehicle @relation(fields: [vehicleId], references: [id])
+  performedBy User    @relation(fields: [performedById], references: [id])
+
+  @@map("audit_logs")
+}

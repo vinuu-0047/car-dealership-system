@@ -4,7 +4,7 @@ const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/tests'],
-  setupFilesAfterFramework: ['<rootDir>/tests/setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   coverageDirectory: 'coverage',
   collectCoverageFrom: ['src/**/*.ts', '!src/server.ts', '!src/types/**'],
   testTimeout: 20000,

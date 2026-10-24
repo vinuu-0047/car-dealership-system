@@ -9,25 +9,33 @@ export class InventoryService {
    */
   async purchase(vehicleId: string, userId: string) {
     return await prisma.$transaction(async (tx) => {
-      // Pessimistic lock: SELECT FOR UPDATE prevents concurrent modification
-      const vehicles = await tx.$queryRaw<Array<{
-        id: string;
-        make: string;
-        model: string;
-        quantity: number;
-        price: string;
-      }>>`
-        SELECT id, make, model, quantity, price::text
-        FROM vehicles
-        WHERE id = ${vehicleId}::uuid
-        FOR UPDATE
-      `;
+      let vehicle: { id: string; make: string; model: string; quantity: number; price: any } | null = null;
+      const isPostgres = process.env.DATABASE_URL?.startsWith('postgres');
 
-      if (vehicles.length === 0) {
-        throw new NotFoundError(`Vehicle with id "${vehicleId}" not found`);
+      if (isPostgres) {
+        // Pessimistic lock for PostgreSQL: SELECT FOR UPDATE prevents concurrent modification
+        const vehicles = await tx.$queryRaw<Array<{
+          id: string;
+          make: string;
+          model: string;
+          quantity: number;
+          price: string;
+        }>>`
+          SELECT id, make, model, quantity, price::text
+          FROM vehicles
+          WHERE id = ${vehicleId}::uuid
+          FOR UPDATE
+        `;
+        if (vehicles.length > 0) vehicle = vehicles[0];
+      } else {
+        // SQLite: database-level write lock serializes concurrent transactions atomically
+        const found = await tx.vehicle.findUnique({ where: { id: vehicleId } });
+        if (found) vehicle = { ...found, price: String(found.price) };
       }
 
-      const vehicle = vehicles[0];
+      if (!vehicle) {
+        throw new NotFoundError(`Vehicle with id "${vehicleId}" not found`);
+      }
 
       if (vehicle.quantity <= 0) {
         throw new ConflictError('Vehicle is out of stock');
@@ -42,7 +50,7 @@ export class InventoryService {
           data: {
             userId,
             vehicleId,
-            priceAtPurchase: parseFloat(vehicle.price),
+            priceAtPurchase: parseFloat(String(vehicle.price)),
             status: 'COMPLETED',
           },
         }),

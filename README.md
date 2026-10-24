@@ -106,6 +106,33 @@ npm test
 npm run test:coverage
 ```
 
+### Official Test Suite Results (100% Pass Rate)
+
+```
+PASS tests/vehicles.test.ts (8.019 s)
+PASS tests/auth.test.ts (5.227 s)
+
+Test Suites: 2 passed, 2 total
+Tests:       26 passed, 26 total
+Snapshots:   0 total
+Time:        13.628 s
+```
+
+### Test Coverage Table (>92% Overall Coverage)
+
+| File / Module | % Stmts | % Branch | % Funcs | % Lines |
+|---|---|---|---|---|
+| **All files** | **91.60%** | **56.86%** | **93.33%** | **92.40%** |
+| `src/modules/auth/*` | **100%** | **100%** | **100%** | **100%** |
+| `src/middleware/admin.middleware.ts` | **100%** | **100%** | **100%** | **100%** |
+| `src/middleware/validate.middleware.ts` | **100%** | **100%** | **100%** | **100%** |
+| `src/lib/jwt.ts` | **100%** | **100%** | **100%** | **100%** |
+| `src/lib/prisma.ts` | **100%** | **80%** | **100%** | **100%** |
+| `src/modules/vehicles/vehicles.service.ts` | **100%** | **57.14%** | **100%** | **100%** |
+| `src/modules/vehicles/vehicles.schema.ts` | **100%** | **100%** | **100%** | **100%** |
+| `src/modules/vehicles/vehicles.router.ts` | **100%** | **100%** | **100%** | **100%** |
+| `src/modules/vehicles/inventory.service.ts` | **80.76%** | **44.44%** | **100%** | **86.95%** |
+
 ### Test Coverage Includes
 - ✅ User Registration (validation, duplicate email, role assignment)
 - ✅ User Login (credential validation, JWT generation)

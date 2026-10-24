@@ -8,9 +8,9 @@ export class VehicleService {
     const skip = (page - 1) * limit;
 
     const where = {
-      ...(make && { make: { contains: make, mode: 'insensitive' as const } }),
-      ...(model && { model: { contains: model, mode: 'insensitive' as const } }),
-      ...(category && { category: { contains: category, mode: 'insensitive' as const } }),
+      ...(make && { make: { contains: make } }),
+      ...(model && { model: { contains: model } }),
+      ...(category && { category: { contains: category } }),
       ...((minPrice !== undefined || maxPrice !== undefined) && {
         price: {
           ...(minPrice !== undefined && { gte: minPrice }),
