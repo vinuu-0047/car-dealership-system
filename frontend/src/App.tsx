@@ -14,7 +14,7 @@ const App: React.FC = () => {
   }, [theme]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#070b12] text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
       <Navbar />
       <Routes>
         {/* Main screen displays the vehicle catalog to everyone directly */}

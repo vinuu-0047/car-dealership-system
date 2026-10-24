@@ -37,9 +37,9 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
 
   return (
     <>
-      <div className="card group hover:border-amber-500/40 dark:hover:border-amber-500/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/5 flex flex-col overflow-hidden">
-        {/* Image / Header */}
-        <div className="relative h-52 bg-zinc-100 dark:bg-zinc-800 rounded-t-xl overflow-hidden flex items-center justify-center">
+      <div className="group bg-[#0d1624] hover:bg-[#121c2d] border border-zinc-800/90 hover:border-teal-500/40 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-teal-500/5 flex flex-col overflow-hidden">
+        {/* Vehicle Image Header */}
+        <div className="relative h-48 sm:h-52 bg-zinc-900 rounded-t-2xl overflow-hidden flex items-center justify-center">
           {vehicle.imageUrl ? (
             <img
               src={vehicle.imageUrl}
@@ -53,42 +53,64 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
           ) : (
             <span className="text-6xl">{getCategoryIcon(vehicle.category)}</span>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+
+          {/* Dark gradient overlay at bottom of photo for text contrast */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
+
+          {/* Stock Status Badge */}
           <div className="absolute top-3 right-3 z-10">
             <Badge variant={stock.variant}>{stock.label}</Badge>
           </div>
+
+          {/* Category Tag Badge */}
           <div className="absolute top-3 left-3 z-10">
-            <Badge variant="info">{vehicle.category}</Badge>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#070b12]/80 text-zinc-300 border border-zinc-700/80 backdrop-blur-sm">
+              {vehicle.category}
+            </span>
           </div>
+
+          {/* Electric Indicator */}
           {vehicle.category === 'Electric' && (
-            <div className="absolute bottom-3 right-3 z-10">
-              <Zap className="w-4 h-4 text-amber-400" />
+            <div className="absolute bottom-3 right-3 z-10 bg-emerald-950/80 border border-emerald-500/80 p-1.5 rounded-full">
+              <Zap className="w-3.5 h-3.5 text-emerald-400" />
             </div>
           )}
         </div>
 
-        {/* Content */}
+        {/* Card Content */}
         <div className="p-5 flex flex-col flex-1">
-          <div className="flex items-start justify-between mb-1">
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-white leading-tight">
-              {vehicle.year} {vehicle.make} {vehicle.model}
+          {/* Make & Model */}
+          <div className="mb-1">
+            <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+              {vehicle.make}
+            </p>
+            <h3 className="text-base sm:text-lg font-bold text-white leading-tight truncate">
+              {vehicle.year} {vehicle.model}
             </h3>
           </div>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-3 font-mono">VIN: {vehicle.vin}</p>
 
-          <div className="mt-auto pt-2">
-            <p className="text-2xl font-black text-amber-600 dark:text-amber-400 mb-4 tracking-tight">
-              {formatPrice(vehicle.price)}
-            </p>
+          {/* VIN & Details */}
+          <p className="text-[10px] text-zinc-500 mb-3 font-mono">VIN: {vehicle.vin}</p>
 
-            {/* Actions */}
-            <div className="flex gap-2">
+          {/* Price & Action Button */}
+          <div className="mt-auto pt-2 border-t border-zinc-800/80">
+            <div className="flex items-baseline justify-between mb-3">
+              <div>
+                <p className="text-[10px] text-zinc-400 font-semibold">Avg. Ex-Showroom</p>
+                <p className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                  {formatPrice(vehicle.price)}
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
               <button
                 onClick={handlePurchaseClick}
                 disabled={isOutOfStock || purchase.isPending}
-                className="flex-1 flex items-center justify-center gap-2 btn-primary text-sm py-2.5"
+                className="flex-1 flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-500 disabled:bg-zinc-800 disabled:text-zinc-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-all shadow-md shadow-teal-600/20 active:scale-[0.98]"
               >
-                <ShoppingCart className="w-4 h-4" />
+                <ShoppingCart className="w-3.5 h-3.5" />
                 {isOutOfStock ? 'Sold Out' : purchase.isPending ? 'Processing...' : 'Purchase'}
               </button>
 
@@ -96,17 +118,17 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
                 <>
                   <button
                     onClick={() => setShowEdit(true)}
-                    className="btn-secondary p-2.5 rounded-lg"
+                    className="p-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors"
                     title="Edit vehicle"
                   >
-                    <Edit className="w-4 h-4" />
+                    <Edit className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => setShowRestock(true)}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white p-2.5 rounded-lg transition-colors"
+                    className="p-2.5 rounded-xl bg-emerald-950 hover:bg-emerald-900 border border-emerald-800/80 text-emerald-300 transition-colors"
                     title="Restock inventory"
                   >
-                    <RotateCcw className="w-4 h-4" />
+                    <RotateCcw className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => {
@@ -114,10 +136,10 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
                         deleteVehicle.mutate(vehicle.id);
                       }
                     }}
-                    className="btn-danger p-2.5 rounded-lg"
+                    className="p-2.5 rounded-xl bg-rose-950 hover:bg-rose-900 border border-rose-800/80 text-rose-300 transition-colors"
                     title="Delete vehicle"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </>
               )}
@@ -128,7 +150,9 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
 
       {showRestock && <RestockModal vehicle={vehicle} onClose={() => setShowRestock(false)} />}
       {showEdit && <EditVehicleModal vehicle={vehicle} onClose={() => setShowEdit(false)} />}
-      {showAuthPrompt && <AuthPromptModal vehicle={vehicle} onClose={() => setShowAuthPrompt(false)} />}
+      {showAuthPrompt && (
+        <AuthPromptModal vehicle={vehicle} onClose={() => setShowAuthPrompt(false)} />
+      )}
     </>
   );
 };

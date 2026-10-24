@@ -1,7 +1,12 @@
+import dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config({ path: path.resolve(__dirname, '../.env.test'), override: true });
+process.env.DATABASE_URL = 'file:./test.db';
+
 import { prisma } from '../src/lib/prisma';
 
 beforeAll(async () => {
-  // Ensure DB connection for integration tests
   await prisma.$connect();
 });
 

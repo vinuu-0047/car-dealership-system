@@ -14,6 +14,7 @@ export const CreateVehicleSchema = z.object({
 export const UpdateVehicleSchema = CreateVehicleSchema.partial().omit({ vin: true });
 
 export const SearchQuerySchema = z.object({
+  search: z.string().optional(),
   make: z.string().optional(),
   model: z.string().optional(),
   category: z.string().optional(),
