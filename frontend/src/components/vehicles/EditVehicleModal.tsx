@@ -40,17 +40,17 @@ export const EditVehicleModal: React.FC<Props> = ({ vehicle, onClose }) => {
     update.mutate({ id: vehicle.id, data }, { onSuccess: () => onClose() });
   };
 
-  const CATEGORIES = ['Sedan', 'SUV', 'Truck', 'Sports', 'Electric', 'Hybrid'];
+  const CATEGORIES = ['SUV', 'Sedan', 'Hatchback', 'Electric', '4x4 Off-Road'];
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="card w-full max-w-lg">
-        <div className="flex items-center justify-between p-6 border-b border-slate-700">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="card w-full max-w-lg bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-2xl">
+        <div className="flex items-center justify-between p-6 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-3">
-            <Edit3 className="w-5 h-5 text-blue-400" />
-            <h2 className="text-lg font-bold">Edit Vehicle</h2>
+            <Edit3 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-white">Edit Vehicle</h2>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-white transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -59,7 +59,7 @@ export const EditVehicleModal: React.FC<Props> = ({ vehicle, onClose }) => {
             <div>
               <label className="label">Make *</label>
               <input {...register('make')} className="input" />
-              {errors.make && <p className="text-red-400 text-xs mt-1">{errors.make.message}</p>}
+              {errors.make && <p className="text-rose-500 text-xs mt-1">{errors.make.message}</p>}
             </div>
             <div>
               <label className="label">Model *</label>
@@ -74,21 +74,27 @@ export const EditVehicleModal: React.FC<Props> = ({ vehicle, onClose }) => {
             <div>
               <label className="label">Category *</label>
               <select {...register('category')} className="input">
-                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
           <div>
-            <label className="label">Price (USD) *</label>
-            <input type="number" step="0.01" {...register('price', { valueAsNumber: true })} className="input" />
+            <label className="label">Price in INR (₹) *</label>
+            <input type="number" step="1000" {...register('price', { valueAsNumber: true })} className="input" />
           </div>
           <div>
             <label className="label">Photo URL (Optional)</label>
-            <input {...register('imageUrl')} className="input" placeholder="https://images.unsplash.com/photo-..." />
-            {errors.imageUrl && <p className="text-red-400 text-xs mt-1">{errors.imageUrl.message}</p>}
+            <input {...register('imageUrl')} className="input" placeholder="https://images.unsplash.com/..." />
+            {errors.imageUrl && <p className="text-rose-500 text-xs mt-1">{errors.imageUrl.message}</p>}
           </div>
-          <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="btn-secondary flex-1">Cancel</button>
+          <div className="flex gap-3 pt-3">
+            <button type="button" onClick={onClose} className="btn-secondary flex-1">
+              Cancel
+            </button>
             <button type="submit" disabled={update.isPending} className="btn-primary flex-1">
               {update.isPending ? 'Saving...' : 'Save Changes'}
             </button>

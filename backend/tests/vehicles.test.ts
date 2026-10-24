@@ -49,9 +49,10 @@ describe('Vehicles API — TDD Suite', () => {
       expect(Array.isArray(res.body.data.vehicles)).toBe(true);
     });
 
-    it('should return 401 for unauthenticated requests', async () => {
+    it('should allow unauthenticated guests to view the catalog on the main screen', async () => {
       const res = await request.get('/api/vehicles');
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(200);
+      expect(res.body.data).toHaveProperty('vehicles');
     });
   });
 

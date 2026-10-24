@@ -6,7 +6,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const formatPrice = (price: string | number): string => {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(price));
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(Number(price));
 };
 
 export const getStockBadge = (quantity: number): { label: string; variant: 'success' | 'warning' | 'danger' } => {
@@ -17,7 +21,14 @@ export const getStockBadge = (quantity: number): { label: string; variant: 'succ
 
 export const getCategoryIcon = (category: string): string => {
   const icons: Record<string, string> = {
-    Sedan: '🚗', SUV: '🚙', Truck: '🛻', Sports: '🏎️', Electric: '⚡', Hybrid: '♻️',
+    SUV: '🚙',
+    Sedan: '🚗',
+    Hatchback: '🚘',
+    Electric: '⚡',
+    '4x4 Off-Road': '⛰️',
+    Truck: '🛻',
+    Sports: '🏎️',
+    Hybrid: '♻️',
   };
   return icons[category] || '🚘';
 };
