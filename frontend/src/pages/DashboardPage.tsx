@@ -11,16 +11,15 @@ import {
   SlidersHorizontal,
   ChevronRight,
   ChevronLeft,
-  Sparkles,
   MapPin,
-  Check,
-  Zap,
 } from 'lucide-react';
 import { useVehicles } from '../hooks/useVehicles';
 import { VehicleCard } from '../components/vehicles/VehicleCard';
 import { AddVehicleModal } from '../components/vehicles/AddVehicleModal';
+import { CarDossierModal } from '../components/vehicles/CarDossierModal';
 import { useAuthStore } from '../store/authStore';
 import { formatPrice } from '../lib/utils';
+import { Vehicle } from '../types';
 
 type BudgetTier = 'all' | 'under10' | '10to20' | 'above20';
 
@@ -40,9 +39,6 @@ const BODY_SUB_FILTERS = [
   { id: '4x4 Off-Road', label: '4x4 Off-Road' },
 ];
 
-const FUEL_TYPES = ['All', 'Petrol', 'Diesel', 'Electric', 'Hybrid'];
-const TRANSMISSIONS = ['All', 'Manual', 'Automatic'];
-
 export const DashboardPage: React.FC = () => {
   const { user } = useAuthStore();
   const isAdmin = user?.role === 'ADMIN';
@@ -57,6 +53,7 @@ export const DashboardPage: React.FC = () => {
   const [selectedTransmission, setSelectedTransmission] = useState('All');
   const [page, setPage] = useState(1);
   const [showAdd, setShowAdd] = useState(false);
+  const [selectedDossierVehicle, setSelectedDossierVehicle] = useState<Vehicle | null>(null);
 
   // Trending container scroll ref
   const trendingScrollRef = useRef<HTMLDivElement>(null);
@@ -329,10 +326,7 @@ export const DashboardPage: React.FC = () => {
             {trendingCars.map((v, idx) => (
               <div
                 key={v.id}
-                onClick={() => {
-                  setSearch(v.model);
-                  setPage(1);
-                }}
+                onClick={() => setSelectedDossierVehicle(v)}
                 className="group relative flex items-center gap-3 bg-[#131c2a] hover:bg-[#19263a] border border-zinc-800/90 hover:border-teal-500/50 rounded-xl p-2.5 sm:p-3 cursor-pointer transition-all duration-200 flex-shrink-0 w-52 sm:w-56"
               >
                 {/* Ad / Sponsored Badge (Index 0 gets Ad tag like reference image) */}
@@ -433,7 +427,6 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* Sub-Filters: Body Types Pills (Sub Compact SUV, Hatchback, etc.) */}
-        {/* Note: Matches the cyan outline on active pill seen in reference screenshot! */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-8 text-xs font-semibold scrollbar-none">
           {BODY_SUB_FILTERS.map((cat) => (
             <button
@@ -537,7 +530,11 @@ export const DashboardPage: React.FC = () => {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {data?.vehicles.map((vehicle) => (
-                <VehicleCard key={vehicle.id} vehicle={vehicle} />
+                <VehicleCard
+                  key={vehicle.id}
+                  vehicle={vehicle}
+                  onOpenDossier={(veh) => setSelectedDossierVehicle(veh)}
+                />
               ))}
             </div>
 
@@ -566,6 +563,14 @@ export const DashboardPage: React.FC = () => {
           </>
         )}
       </main>
+
+      {/* Car Dossier & Booking Folder Modal */}
+      {selectedDossierVehicle && (
+        <CarDossierModal
+          vehicle={selectedDossierVehicle}
+          onClose={() => setSelectedDossierVehicle(null)}
+        />
+      )}
 
       {/* Admin Add Vehicle Modal */}
       {showAdd && <AddVehicleModal onClose={() => setShowAdd(false)} />}

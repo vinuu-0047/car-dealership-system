@@ -1,43 +1,45 @@
 import React, { useState } from 'react';
-import { ShoppingCart, RotateCcw, Edit, Trash2, Zap } from 'lucide-react';
+import { ShoppingCart, RotateCcw, Edit, Trash2, Zap, FolderOpen, ArrowRight } from 'lucide-react';
 import { Vehicle } from '../../types';
 import { Badge } from '../ui/Badge';
 import { formatPrice, getStockBadge, getCategoryIcon } from '../../lib/utils';
-import { usePurchaseVehicle, useDeleteVehicle } from '../../hooks/useVehicles';
+import { useDeleteVehicle } from '../../hooks/useVehicles';
 import { useAuthStore } from '../../store/authStore';
 import { RestockModal } from './RestockModal';
 import { EditVehicleModal } from './EditVehicleModal';
-import { AuthPromptModal } from './AuthPromptModal';
+import { CarDossierModal } from './CarDossierModal';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
+  onOpenDossier?: (vehicle: Vehicle) => void;
 }
 
-export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
-  const { user, isAuthenticated } = useAuthStore();
+export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onOpenDossier }) => {
+  const { user } = useAuthStore();
   const isAdmin = user?.role === 'ADMIN';
-  const purchase = usePurchaseVehicle();
   const deleteVehicle = useDeleteVehicle();
+
   const [showRestock, setShowRestock] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
-  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
+  const [showDossier, setShowDossier] = useState(false);
 
   const stock = getStockBadge(vehicle.quantity);
   const isOutOfStock = vehicle.quantity === 0;
 
-  const handlePurchaseClick = () => {
-    if (!isAuthenticated) {
-      setShowAuthPrompt(true);
-      return;
-    }
-    if (!isOutOfStock && !purchase.isPending) {
-      purchase.mutate(vehicle.id);
+  const handleCardClick = () => {
+    if (onOpenDossier) {
+      onOpenDossier(vehicle);
+    } else {
+      setShowDossier(true);
     }
   };
 
   return (
     <>
-      <div className="group bg-[#0d1624] hover:bg-[#121c2d] border border-zinc-800/90 hover:border-teal-500/40 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-teal-500/5 flex flex-col overflow-hidden">
+      <div
+        onClick={handleCardClick}
+        className="group bg-[#0d1624] hover:bg-[#121c2d] border border-zinc-800/90 hover:border-teal-500/50 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-teal-500/10 flex flex-col overflow-hidden cursor-pointer"
+      >
         {/* Vehicle Image Header */}
         <div className="relative h-48 sm:h-52 bg-zinc-900 rounded-t-2xl overflow-hidden flex items-center justify-center">
           {vehicle.imageUrl ? (
@@ -55,7 +57,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
           )}
 
           {/* Dark gradient overlay at bottom of photo for text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent pointer-events-none" />
 
           {/* Stock Status Badge */}
           <div className="absolute top-3 right-3 z-10">
@@ -64,17 +66,24 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
 
           {/* Category Tag Badge */}
           <div className="absolute top-3 left-3 z-10">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#070b12]/80 text-zinc-300 border border-zinc-700/80 backdrop-blur-sm">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#070b12]/90 text-zinc-300 border border-zinc-700/80 backdrop-blur-sm">
               {vehicle.category}
             </span>
           </div>
 
           {/* Electric Indicator */}
           {vehicle.category === 'Electric' && (
-            <div className="absolute bottom-3 right-3 z-10 bg-emerald-950/80 border border-emerald-500/80 p-1.5 rounded-full">
+            <div className="absolute bottom-3 right-3 z-10 bg-emerald-950/90 border border-emerald-500/80 p-1.5 rounded-full">
               <Zap className="w-3.5 h-3.5 text-emerald-400" />
             </div>
           )}
+
+          {/* Quick Hover Dossier Pill */}
+          <div className="absolute bottom-3 left-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="px-3 py-1 bg-teal-500 text-teal-950 text-[10px] font-black rounded-full shadow-lg flex items-center gap-1">
+              <FolderOpen className="w-3 h-3" /> Click to Open Car Folder
+            </span>
+          </div>
         </div>
 
         {/* Card Content */}
@@ -84,7 +93,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
             <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
               {vehicle.make}
             </p>
-            <h3 className="text-base sm:text-lg font-bold text-white leading-tight truncate">
+            <h3 className="text-base sm:text-lg font-bold text-white leading-tight truncate group-hover:text-teal-300 transition-colors">
               {vehicle.year} {vehicle.model}
             </h3>
           </div>
@@ -106,16 +115,24 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
             {/* Action Buttons */}
             <div className="flex items-center gap-2">
               <button
-                onClick={handlePurchaseClick}
-                disabled={isOutOfStock || purchase.isPending}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCardClick();
+                }}
+                disabled={isOutOfStock}
                 className="flex-1 flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-500 disabled:bg-zinc-800 disabled:text-zinc-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-all shadow-md shadow-teal-600/20 active:scale-[0.98]"
               >
-                <ShoppingCart className="w-3.5 h-3.5" />
-                {isOutOfStock ? 'Sold Out' : purchase.isPending ? 'Processing...' : 'Purchase'}
+                <FolderOpen className="w-3.5 h-3.5" />
+                <span>{isOutOfStock ? 'Sold Out' : 'Open Folder & Book'}</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-auto" />
               </button>
 
               {isAdmin && (
-                <>
+                <div
+                  className="flex items-center gap-1.5"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <button
                     onClick={() => setShowEdit(true)}
                     className="p-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors"
@@ -141,18 +158,22 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
-                </>
+                </div>
               )}
             </div>
           </div>
         </div>
       </div>
 
+      {showDossier && (
+        <CarDossierModal
+          vehicle={vehicle}
+          onClose={() => setShowDossier(false)}
+        />
+      )}
+
       {showRestock && <RestockModal vehicle={vehicle} onClose={() => setShowRestock(false)} />}
       {showEdit && <EditVehicleModal vehicle={vehicle} onClose={() => setShowEdit(false)} />}
-      {showAuthPrompt && (
-        <AuthPromptModal vehicle={vehicle} onClose={() => setShowAuthPrompt(false)} />
-      )}
     </>
   );
 };
